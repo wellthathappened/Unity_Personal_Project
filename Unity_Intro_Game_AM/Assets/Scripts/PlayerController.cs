@@ -9,9 +9,15 @@ public class PlayerController : MonoBehaviour
 
     Vector2 camRotation;
 
+    [Header("Movement Stats")]
+    public bool sprinting = false;
     public float speed = 10f;
+    public float sprintMult = 1.5f;
     public float jumpHeight = 5f;
+    public float groundDetection = 1f;
 
+    [Header("User Settings")]
+    public bool sprintToggle = false;
     public float mouseSensitivity = 2.0f;
     public float Xsensitivity = 2.0f;
     public float Ysensitivity = 2.0f;
@@ -45,14 +51,29 @@ public class PlayerController : MonoBehaviour
         playerCam.transform.localRotation = Quaternion.AngleAxis(camRotation.y, Vector3.left);
         transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
 
+
+        // Sprint turn on for toggle & not toggle
+        if ((!sprinting) && ((!sprintToggle && Input.GetKey(KeyCode.LeftShift)) || (sprintToggle && Input.GetKey(KeyCode.LeftShift) && (Input.GetAxisRaw("Vertical") > 0))))
+            sprinting = true;
+
+
         // Movement math calculation velocity measured by input * speed
         Vector3 temp = myRB.velocity;
 
         temp.x = Input.GetAxisRaw("Horizontal") * speed;
         temp.z = Input.GetAxisRaw("Vertical") * speed;
 
+        // If sprinting, check to see if disable condition flags (also amplify speed if sprinting)
+        if (sprinting)
+        {
+            temp.z *= sprintMult;
+
+            if ((sprintToggle && (Input.GetAxisRaw("Vertical") <= 0)) || (!sprintToggle && Input.GetKeyUp(KeyCode.LeftShift)))
+                sprinting = false;
+        }
+
         // Jump
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && Physics.Raycast(transform.position, -transform.up, groundDetection))
             temp.y = jumpHeight;
 
         // Give calculated velocity back to rigidbody
