@@ -437,7 +437,7 @@ GameObject:
   - component: {fileID: 1651569443}
   - component: {fileID: 1651569442}
   m_Layer: 0
-  m_Name: Weapon1
+  m_Name: weapon1
   m_TagString: weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -587,6 +587,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 8754415581911632136, guid: f5263ae4d31c60a4bb3e70f26be0544e, type: 3}
+      propertyPath: shot
+      value: 
+      objectReference: {fileID: 1984555148691346138, guid: b087452dd34bc1b439f706afa5eeb50c, type: 3}
     - target: {fileID: 8754415581911632136, guid: f5263ae4d31c60a4bb3e70f26be0544e, type: 3}
       propertyPath: weaponSlot
       value: 
