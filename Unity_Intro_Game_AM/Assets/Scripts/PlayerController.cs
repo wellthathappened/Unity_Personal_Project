@@ -16,6 +16,19 @@ public class PlayerController : MonoBehaviour
 
     [Header("Weapon Stats")]
     public Transform weaponSlot;
+    public GameObject shot;
+    public float shotVel = 0;
+    public int weaponID = -1;
+    public int fireMode = 0;
+    public float fireRate = 0;
+    public float currentClip = 0;
+    public float clipSize = 0;
+    public float maxAmmo = 0;
+    public float currentAmmo = 0;
+    public float reloadAmt = 0;
+    public float bulletLifespan = 0;
+    public bool canFire = true;
+
 
     [Header("Movement Stats")]
     public bool sprinting = false;
@@ -59,6 +72,20 @@ public class PlayerController : MonoBehaviour
         playerCam.transform.localRotation = Quaternion.AngleAxis(camRotation.y, Vector3.left);
         transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
 
+        if (Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 0)
+        {
+            GameObject s = Instantiate(shot, weaponSlot.position, weaponSlot.rotation);
+            s.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
+            Destroy(s, bulletLifespan);
+
+            canFire = false;
+            currentClip--;
+            StartCoroutine("cooldownFire");
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+            reloadClip();
+
 
         // Sprint turn on for toggle & not toggle
         if ((!sprinting) && ((!sprintToggle && Input.GetKey(KeyCode.LeftShift)) || (sprintToggle && Input.GetKey(KeyCode.LeftShift) && (Input.GetAxisRaw("Vertical") > 0))))
@@ -100,6 +127,17 @@ public class PlayerController : MonoBehaviour
 
             Destroy(collision.gameObject);
         }
+
+        if ((collision.gameObject.tag == "ammoPickup") && currentAmmo < maxAmmo)
+        {
+            if (currentAmmo + reloadAmt > maxAmmo)
+                currentAmmo = maxAmmo;
+
+            else
+                currentAmmo += reloadAmt;
+
+            Destroy(collision.gameObject);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -109,6 +147,56 @@ public class PlayerController : MonoBehaviour
             other.transform.SetPositionAndRotation(weaponSlot.position, weaponSlot.rotation);
 
             other.transform.SetParent(weaponSlot);
+
+            switch(other.gameObject.name)
+            {
+                case "weapon1":
+                    weaponID = 0;
+                    shotVel = 10000;
+                    fireMode = 0;
+                    fireRate = 0.1f;
+                    currentClip = 20;
+                    clipSize = 20;
+                    maxAmmo = 400;
+                    currentAmmo = 200;
+                    reloadAmt = 20;
+                    bulletLifespan = .5f;
+                    break;
+
+                default:
+                    break;
+            }
         }
+    }
+
+    public void reloadClip()
+    {
+        if (currentClip >= clipSize)
+            return;
+
+        else
+        {
+            float reloadCount = clipSize - currentClip;
+
+            if (currentAmmo < reloadCount)
+            {
+                currentClip += currentAmmo;
+                currentAmmo = 0;
+                return;
+            }
+
+            else
+            {
+                currentClip += reloadCount;
+                currentAmmo -= reloadCount;
+                return;
+            }
+        }
+    }
+
+    IEnumerator cooldownFire()
+    {
+        yield return new WaitForSeconds(fireRate);
+        canFire = true;
     }
 }
