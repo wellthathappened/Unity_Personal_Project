@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
     Rigidbody myRB;
     Camera playerCam;
 
+    Transform cameraHolder;
+
     Vector2 camRotation;
 
     [Header("Player Stats")]
@@ -52,7 +54,8 @@ public class PlayerController : MonoBehaviour
     {
         // Initialized components
         myRB = GetComponent<Rigidbody>();
-        playerCam = transform.GetChild(0).GetComponent<Camera>();
+        playerCam = Camera.main;
+        cameraHolder = transform.GetChild(0);
 
         // Camera setup
         camRotation = Vector2.zero;
@@ -73,8 +76,10 @@ public class PlayerController : MonoBehaviour
         // Limit vertical rotation
         camRotation.y = Mathf.Clamp(camRotation.y, -camRotationLimit, camRotationLimit);
 
+        playerCam.transform.position = cameraHolder.position;
+
         // Set camera rotation on the vertical axis | Set player rotation on horizontal axis
-        playerCam.transform.localRotation = Quaternion.AngleAxis(camRotation.y, Vector3.left);
+        playerCam.transform.rotation = Quaternion.Euler(-camRotation.y, camRotation.x, 0);
         transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
 
         if (Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 0)
