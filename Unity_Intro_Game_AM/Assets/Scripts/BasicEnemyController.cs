@@ -15,6 +15,7 @@ public class BasicEnemyController : MonoBehaviour
     public int damageGiven = 1;
     public int damageReceived = 1;
     public float pushBackForce = 5;
+    public float distanceDetection = 5;
 
 
     // Start is called before the first frame update
@@ -22,6 +23,8 @@ public class BasicEnemyController : MonoBehaviour
     {
         player = GameObject.Find("Player").GetComponent<PlayerController>();
         agent = GetComponent<NavMeshAgent>();
+
+        
     }
 
     // Update is called once per frame
@@ -29,7 +32,9 @@ public class BasicEnemyController : MonoBehaviour
     {
         target = GameObject.Find("Player").transform;
 
+
         agent.destination = target.position;
+
 
         if (health <= 0)
             Destroy(gameObject);
